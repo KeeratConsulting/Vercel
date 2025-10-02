@@ -1,107 +1,110 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Get a Quote</title>
-  <style>
-    body { font-family: system-ui, Arial, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 12px; }
-    label { display:block; margin-top:12px; font-weight:600; }
-    input, select, textarea { width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; margin-top:6px; }
-    button { margin-top:16px; padding:12px 16px; border:0; border-radius:10px; cursor:pointer; }
-    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .note{ color:#666; font-size:12px; }
-    .ok { color: #0a7a0a; }
-    .err { color: #b00020; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painting Quote</title>
+<style>
+  :root {
+    --bg:#ffffff; --text:#0b1220; --muted:#6b7280; --border:#e5e7eb;
+    --accent:#fbbf24; --accentText:#111827; --input:#f9fafb;
+  }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); margin:0; padding:24px}
+  h1{margin:0 0 12px 0; font-size:26px}
+  p.muted{color:var(--muted); margin:0 0 16px 0}
+  form{display:grid; gap:14px; max-width:860px; margin:0 auto}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  label.lbl{font-weight:600; font-size:14px; margin-bottom:4px; display:block}
+  input[type=text],input[type=email],input[type=tel],input[type=number],select,textarea{
+    width:100%; background:var(--input); border:1px solid var(--border); border-radius:12px;
+    padding:12px 14px; font-size:15px; outline:none;
+  }
+  textarea{min-height:110px; resize:vertical}
+  .card{border:1px solid var(--border); border-radius:14px; padding:14px}
+  .row{display:flex; gap:18px; flex-wrap:wrap; align-items:center}
+  .radio, .check{display:flex; align-items:center; gap:8px; font-size:14px}
+  .hint{color:var(--muted); font-size:12px}
+  details{border:1px solid var(--border); border-radius:12px; background:#fcfcfd}
+  summary{cursor:pointer; padding:12px 14px; font-weight:600}
+  details > div{padding:0 14px 14px 14px}
+  .upload{display:inline-flex; align-items:center; gap:8px; border:1px dashed var(--border);
+          background:#f8fafc; border-radius:12px; padding:10px 12px; cursor:pointer; width:max-content}
+  .upload input{display:none}
+  .btn{
+    -webkit-appearance:none; appearance:none; border:0; background:var(--accent); color:var(--accentText);
+    padding:14px 18px; border-radius:14px; font-weight:700; font-size:16px; cursor:pointer; width:100%;
+  }
+  .center{max-width:860px; margin:0 auto}
+  .footer-note{color:var(--muted); font-size:12px}
+  .pill{padding:6px 10px; border:1px solid var(--border); border-radius:999px; background:#fff}
+  @media (max-width:720px){ .grid2{grid-template-columns:1fr} }
+</style>
 </head>
 <body>
-  <h1>Request a Quote</h1>
-  <p class="note">Fill this in and we’ll email you back. You can paste photo links from Google Drive, iCloud, etc.</p>
+  <div class="center">
+    <h1>Get a Painting Quote</h1>
+    <p class="muted">Fill this in and we’ll email you back. Photos help us price faster.</p>
 
-  <form id="quote">
-    <div class="row">
-      <div>
-        <label>Name<input name="name" required></label>
+    <form id="quote">
+
+      <div class="grid2">
+        <div>
+          <label class="lbl">Name</label>
+          <input name="name" required>
+        </div>
+        <div>
+          <label class="lbl">Email</label>
+          <input type="email" name="email" required>
+        </div>
       </div>
-      <div>
-        <label>Email<input type="email" name="email" required></label>
+
+      <div class="grid2">
+        <div>
+          <label class="lbl">Phone</label>
+          <input type="tel" name="phone" required>
+        </div>
+        <div>
+          <label class="lbl">Postcode / Town</label>
+          <input name="postcode" placeholder="e.g., ME14 or Maidstone" required>
+        </div>
       </div>
-    </div>
 
-    <div class="row">
-      <div><label>Phone<input name="phone" required></label></div>
-      <div><label>Postcode<input name="postcode" required></label></div>
-    </div>
+      <div class="grid2">
+        <div>
+          <label class="lbl">Property</label>
+          <select name="property" required>
+            <option value="Residential">Residential</option>
+            <option value="Commercial">Commercial</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">Do you have the paint?</label>
+          <select name="paint_supply" required>
+            <option value="We supply">We supply</option>
+            <option value="Client supplies">I have the paint</option>
+          </select>
+        </div>
+      </div>
 
-    <label>Address (optional)<input name="address"></label>
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <strong>Room sizes</strong>
+          <div class="row">
+            <label class="radio"><input type="radio" name="room_size_mode" value="I know sizes per room"> I know sizes per room</label>
+            <label class="radio"><input type="radio" name="room_size_mode" value="I'm not sure" checked> I’m not sure</label>
+          </div>
+        </div>
 
-    <label>Service
-      <select name="service" required>
-        <option value="">Choose…</option>
-        <option>Painting & Decorating</option>
-        <option>Brickwork / Repointing</option>
-        <option>Extensions / Refurb</option>
-        <option>Bathroom / Kitchen</option>
-        <option>Other</option>
-      </select>
-    </label>
+        <div class="grid2" style="margin-top:10px">
+          <div>
+            <label class="lbl">Rooms to paint (approx)</label>
+            <input name="rooms_count" placeholder="e.g., 5">
+          </div>
+          <div style="display:flex; gap:18px; align-items:center; margin-top:28px">
+            <label class="check"><input type="checkbox" name="include_kitchens" value="Yes"> Kitchen(s)</label>
+            <label class="check"><input type="checkbox" name="include_bathrooms" value="Yes"> Bathroom(s)</label>
+          </div>
+        </div>
 
-    <div class="row">
-      <div><label>Budget (optional)<input name="budget" placeholder="e.g. £2,000–£5,000"></label></div>
-      <div><label>Timeline<input name="timeline" placeholder="e.g. ASAP, next month"></label></div>
-    </div>
-
-    <label>Describe the work
-      <textarea name="message" rows="5" required></textarea>
-    </label>
-
-    <label>Photo URL 1 (optional)<input name="photo_url_1" placeholder="https://…"></label>
-    <label>Photo URL 2 (optional)<input name="photo_url_2" placeholder="https://…"></label>
-    <label>Photo URL 3 (optional)<input name="photo_url_3" placeholder="https://…"></label>
-    <label class="note">Tip: paste share links from your phone’s gallery, Google Drive, Dropbox, iCloud, etc.</label>
-
-    <!-- Honeypot (spam trap) -->
-    <input name="source" value="website" hidden>
-    <input name="company" style="display:none">
-
-    <button id="btn" type="submit">Send enquiry</button>
-    <p id="msg"></p>
-  </form>
-
-  <script>
-    const f = document.getElementById('quote');
-    const btn = document.getElementById('btn');
-    const msg = document.getElementById('msg');
-
-    f.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msg.textContent = '';
-      btn.disabled = true; btn.textContent = 'Sending…';
-
-      // Ignore bots that fill hidden "company"
-      const data = Object.fromEntries(new FormData(f).entries());
-      if (data.company) { btn.disabled = false; btn.textContent = 'Send enquiry'; return; }
-
-      try {
-        const r = await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify(data)
-        });
-        const j = await r.json();
-        if (j.ok) {
-          msg.textContent = 'Sent! We’ll get back to you shortly.'; msg.className = 'ok';
-          f.reset();
-        } else {
-          msg.textContent = 'Error sending. Please try again or email us directly.'; msg.className = 'err';
-        }
-      } catch (e) {
-        msg.textContent = 'Network error. Please try again.'; msg.className = 'err';
-      } finally {
-        btn.disabled = false; btn.textContent = 'Send enquiry';
-      }
-    });
-  </script>
-</body>
-</html>
+        <details style="margin-top:12px">
