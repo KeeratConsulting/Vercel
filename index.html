@@ -108,3 +108,125 @@
         </div>
 
         <details style="margin-top:12px">
+          <summary>Help me estimate m² (optional)</summary>
+          <div class="grid2" style="margin-top:10px">
+            <div>
+              <label class="lbl">Approx. total wall area (m²)</label>
+              <input type="number" step="0.1" name="est_area" placeholder="e.g., 120">
+            </div>
+            <div>
+              <label class="lbl">Ceiling height (m)</label>
+              <input type="number" step="0.1" name="est_height" placeholder="e.g., 2.4">
+            </div>
+          </div>
+          <p class="hint" style="margin-top:8px">If unsure, leave this blank—we’ll assess from your photos.</p>
+        </details>
+      </div>
+
+      <details>
+        <summary>Optional details (doors, skirting, radiators)</summary>
+        <div>
+          <input name="details" placeholder="Tell us anything that affects the quote…" />
+        </div>
+      </details>
+
+      <div>
+        <label class="lbl">When would you like to start?</label>
+        <select name="start_when">
+          <option>ASAP</option>
+          <option>Within 2 weeks</option>
+          <option>Within a month</option>
+          <option>Flexible</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="lbl">Photos (optional)</label>
+        <label class="upload">
+          <input id="photos" type="file" accept="image/*" multiple>
+          <span class="pill">Choose images</span>
+          <span id="filecount" class="hint">No files selected</span>
+        </label>
+        <p class="hint">You can select multiple images. They’ll be sent as attachments.</p>
+      </div>
+
+      <div>
+        <label class="lbl">Anything else?</label>
+        <textarea name="message" placeholder="Access, finishes, colour changes, deadlines…"></textarea>
+      </div>
+
+      <!-- Honeypot -->
+      <input name="company" style="display:none">
+
+      <button class="btn" id="submitBtn" type="submit">Send request</button>
+      <p id="status" class="hint"></p>
+    </form>
+  </div>
+
+<script>
+const fileInput = document.getElementById('photos');
+const fileCount = document.getElementById('filecount');
+fileInput.addEventListener('change', () => {
+  fileCount.textContent = fileInput.files.length
+    ? `${fileInput.files.length} file(s) selected`
+    : 'No files selected';
+});
+
+async function filesToBase64List(files) {
+  const maxEach = 7 * 1024 * 1024; // 7MB per file safety
+  const promises = [...files].slice(0,8).map(file => new Promise((resolve) => {
+    if (file.size > maxEach) { resolve(null); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = String(reader.result).split(',')[1] || "";
+      resolve({ filename: file.name, base64, contentType: file.type });
+    };
+    reader.readAsDataURL(file);
+  }));
+  const out = await Promise.all(promises);
+  return out.filter(Boolean);
+}
+
+const form = document.getElementById('quote');
+const statusEl = document.getElementById('status');
+const btn = document.getElementById('submitBtn');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  statusEl.textContent = '';
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  // Stop bots
+  const data = Object.fromEntries(new FormData(form).entries());
+  if (data.company) { btn.disabled = false; btn.textContent = 'Send request'; return; }
+
+  try {
+    data.include_kitchens = data.include_kitchens ? 'Yes' : 'No';
+    data.include_bathrooms = data.include_bathrooms ? 'Yes' : 'No';
+
+    // Attach files as base64
+    data.attachments = await filesToBase64List(fileInput.files);
+
+    const r = await fetch('/api/contact', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    const j = await r.json();
+
+    if (j.ok) {
+      statusEl.textContent = 'Sent! We’ll get back to you shortly.';
+      form.reset();
+      fileCount.textContent = 'No files selected';
+    } else {
+      statusEl.textContent = 'Error sending. Please try again.';
+    }
+  } catch (err) {
+    statusEl.textContent = 'Network error. Please try again.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send request';
+  }
+});
+</script>
+</body>
+</html>
